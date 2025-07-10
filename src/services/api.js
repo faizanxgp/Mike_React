@@ -10,6 +10,14 @@ export const deleteFileOrFolder = (filePath) => {
   });
 };
 import axios from 'axios';
+import { 
+  API_BASE_URL, 
+  LLM_BASE_URL, 
+  KEYCLOAK_CONFIG, 
+  KEYCLOAK_TOKEN_URL,
+  API_TIMEOUT,
+  LLM_TIMEOUT 
+} from '../config/production.js';
 
 // Loading management
 let loadingCallbacks = {
@@ -179,7 +187,7 @@ export const loginToKeycloak = async (username, password) => {
     formData.append('password', password);
 
     const response = await axios.post(
-      'http://96.30.199.117:8080/realms/team_online/protocol/openid-connect/token',
+      KEYCLOAK_TOKEN_URL,
       formData,
       {
         headers: {
@@ -196,12 +204,27 @@ export const loginToKeycloak = async (username, password) => {
 
 // Option A: Create an instance with header pre-configured
 export const api = axios.create({
-  baseURL: 'http://96.30.199.117:8000', // adjust as needed
-  timeout: 15000,
+  baseURL: API_BASE_URL, // Production API endpoint
+  timeout: API_TIMEOUT,
   headers: {
     Authorization: `Bearer ${BEARER}`
   }
 });
+
+// LLM API configuration for AI services
+export const llmApi = axios.create({
+  baseURL: LLM_BASE_URL, // Production LLM endpoint
+  timeout: LLM_TIMEOUT, // Longer timeout for LLM operations
+  headers: {
+    Authorization: `Bearer ${BEARER}`
+  }
+});
+
+// Keycloak configuration
+export const keycloakConfig = KEYCLOAK_CONFIG;
+
+// API Base URLs for reference
+export { API_BASE_URL, LLM_BASE_URL };
 
 // Add a request interceptor
 api.interceptors.request.use((config) => {
@@ -243,6 +266,52 @@ api.interceptors.response.use((response) => {
   }
   return Promise.reject(error);
 });
+
+// LLM API interceptors
+llmApi.interceptors.request.use((config) => {
+  // Update Authorization header with the latest token
+  const currentToken = localStorage.getItem('access_token') || BEARER;
+  if (currentToken) {
+    config.headers.Authorization = `Bearer ${currentToken}`;
+  }
+  
+  // Show loading spinner for LLM requests
+  if (loadingCallbacks.show) {
+    console.log('LLM Request started - showing loading spinner:', config.url);
+    loadingCallbacks.show();
+  }
+  
+  return config;
+}, (error) => {
+  // Hide loading spinner in case of error
+  if (loadingCallbacks.hide) {
+    console.log('LLM Request error - hiding loading spinner');
+    loadingCallbacks.hide();
+  }
+  return Promise.reject(error);
+});
+
+llmApi.interceptors.response.use((response) => {
+  // Hide loading spinner on successful response
+  if (loadingCallbacks.hide) {
+    console.log('LLM Response success - hiding loading spinner:', response.config.url);
+    loadingCallbacks.hide();
+  }
+  return response;
+}, (error) => {
+  // Hide loading spinner on error response
+  if (loadingCallbacks.hide) {
+    console.log('LLM Response error - hiding loading spinner:', error.config?.url);
+    loadingCallbacks.hide();
+  }
+  return Promise.reject(error);
+});
+
+// LLM API Functions - Ready for AI integrations
+export const llmChat = (data) => llmApi.post('/chat', data);
+export const llmCompletion = (data) => llmApi.post('/completion', data);
+export const llmEmbedding = (data) => llmApi.post('/embedding', data);
+export const llmAnalyze = (data) => llmApi.post('/analyze', data);
 
 // Users
 export const getUsersStatus = () =>

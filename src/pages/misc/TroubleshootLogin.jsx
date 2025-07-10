@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { loginToKeycloak, clearBearerToken, decodeJWT } from '../../services/api';
+import { KEYCLOAK_WELL_KNOWN_URL } from '../../config/production';
 
 const TroubleshootLogin = () => {
   const [username, setUsername] = useState('');
@@ -113,7 +114,7 @@ const TroubleshootLogin = () => {
 
       // Test 4: Keycloak endpoint connectivity
       try {
-        const connectivityTest = await fetch('http://96.30.199.117:8080/realms/team_online/.well-known/openid_configuration');
+        const connectivityTest = await fetch(KEYCLOAK_WELL_KNOWN_URL);
         if (connectivityTest.ok) {
           const config = await connectivityTest.json();
           results.tests.push({
