@@ -11,7 +11,7 @@ import UploadModal from './UploadModal';
 import FileDetailsModal from './FileDetailsModal';
 import FileCopyModal from './FileCopyModal';
 import FileMoveModal from './FileMoveModal';
-import FileShareModal from './FileShareMOdal';
+import FileShareModal from './FileShareModal';
 import FilePreviewModal from './FilePreviewModal';
 import PdfPreviewModal from './PdfPreviewModal';
 

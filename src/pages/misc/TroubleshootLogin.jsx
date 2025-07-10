@@ -113,7 +113,7 @@ const TroubleshootLogin = () => {
 
       // Test 4: Keycloak endpoint connectivity
       try {
-        const connectivityTest = await fetch('http://localhost:8080/realms/team_online/.well-known/openid_configuration');
+        const connectivityTest = await fetch('http://96.30.199.117:8080/realms/team_online/.well-known/openid_configuration');
         if (connectivityTest.ok) {
           const config = await connectivityTest.json();
           results.tests.push({

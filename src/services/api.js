@@ -179,7 +179,7 @@ export const loginToKeycloak = async (username, password) => {
     formData.append('password', password);
 
     const response = await axios.post(
-      'http://localhost:8080/realms/team_online/protocol/openid-connect/token',
+      'http://96.30.199.117:8080/realms/team_online/protocol/openid-connect/token',
       formData,
       {
         headers: {
@@ -196,7 +196,7 @@ export const loginToKeycloak = async (username, password) => {
 
 // Option A: Create an instance with header pre-configured
 export const api = axios.create({
-  baseURL: 'http://localhost:5000', // adjust as needed
+  baseURL: 'http://96.30.199.117:8000', // adjust as needed
   timeout: 15000,
   headers: {
     Authorization: `Bearer ${BEARER}`

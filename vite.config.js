@@ -8,6 +8,12 @@ export default defineConfig({
     target: 'esnext'
   },
   server: {
-    allowedHosts: ['muskox-absolute-radically.ngrok-free.app']
+    host: '0.0.0.0',
+    port: 5174,
+    allowedHosts: ['96.30.199.117']
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 3000
   }
 })
